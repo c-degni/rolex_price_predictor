@@ -1,0 +1,32 @@
+name: Weekly Model Update
+
+on:
+  schedule:
+    - cron: '0 0 1,15 * *' # Runs at midnight every 1st and 15th of every month
+
+jobs:
+  update_model:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: 3.9
+          
+      - name: Install dependencies
+        run: pip install -r backend/dependencies.txt
+
+      - name: Run Scraper
+        run: python backend/scraper.py
+
+      - name: Train Model
+        run: python backend/train_model.py
+
+      - name: Deploy Updated Model
+        run: |
+          git add backend/rolex_pricing_model.pkl
+          git commit -m "Updated model"
+          git push
